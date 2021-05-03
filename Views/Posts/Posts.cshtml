@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewData["Title"] = "Posts";
+    Layout = "~/Views/Shared/_MyLayout.cshtml";
+}
+
+<section id="blog" class="section">
+    <div class="container">
+        <div class="row">
+            <!-- section title -->
+            <div class="title text-center wow fadeInDown">
+                <h2>منتجات <span class="color">اضافة</span></h2>
+                <div class="border"></div>
+            </div>
+            <!-- /section title -->
+            <!-- Contact Form  style="width:80%; margin:0 auto;"-->
+            <div class="contact-form   wow fadeInUp" data-wow-duration="500ms" data-wow-delay="300ms">
+                <form id="contact-form" role="form" enctype="multipart/form-data" method="post">
+                    <div class="row text-right">
+                        <div class="form-group col-md-6">
+                            <p>تاريخ اخر عرض للمنتج</p>
+                            <input type="date" placeholder="تاريخ اخر عرض للمنتج" class=" form-control text-right" autocomplete="off" name="item_date" id="item_date" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <p>اسم المنتج</p>
+                            <input type="text" placeholder="اسم المنتج" class="form-control text-right" autocomplete="off" name="Item_name" id="Item_name" />
+                        </div>
+                    </div>
+                    <div class="row text-right">
+                        <div class="form-group col-md-6">
+                            <p>سعر المنتج</p>
+                            <input type="number" placeholder="سعر المنتج" class="form-control text-right" autocomplete="off" name="Item_price" id="Item_price" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <p>صورة المنتج</p>
+                            <input type="file" id="image" value="رجاءا اختيار صورة للمنتج" class="form-control" multiple />
+                        </div>
+                    </div>
+                    <div class="form-group text-right">
+                        <p>تفاصيل المنتج</p>
+                        <textarea rows="6" placeholder="تفاصيل المنتج" class="form-control text-right" autocomplete="off" name="Item_dateils" id="Item_dateils"></textarea>
+                    </div>
+                    <div id="cf-submit">
+                        <input type="submit" id="post" class="btn btn-transparent" value="حفظ">
+                    </div>
+                    <br />
+                    <div id="cf-submit">
+                        <input type="button" id="go" class="btn btn-transparent" onclick="call_Action('posts/index')" value="ذهاب الى واجهة المنتجات">
+                    </div>
+                </form>
+            </div>
+            <!-- ./End Contact Form -->
+        </div> <!-- end row -->
+    </div> <!-- end container -->
+</section>
+
+
+<div id="mydiv">
+    <script>
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+        $("#item_date").val(today);
+        $("#post").on("click", (e) => {
+            e.preventDefault();
+
+            var object = {
+                item_date: $("#item_date").val(),
+                Item_name: $("#Item_name").val(),
+                Item_price: $("#Item_price").val(),
+                Item_dateils: $("#Item_dateils").val(),
+                image: $("#image").val(),
+            };
+            if (object.item_date === "" || object.item_date.trim() === "") {
+                toust.warning("رجاءا اختيار تاريخ اخر عرض للمنتج");
+                return;
+            }
+            else if (object.Item_name === "" || object.Item_name.trim() === "") {
+                toust.warning("رجاءا اكتب اسم المنتج");
+                return;
+            }
+            else if (object.Item_price === "" || object.Item_price.trim() === "") {
+                toust.warning("رجاءا اكتب سعر المنتج");
+                return;
+            }
+            else if (object.Item_dateils === "" || object.Item_dateils.trim() === "") {
+                toust.warning("رجاءا اكتب تفاصيل المنتج");
+                return;
+            }
+            call_ajax("POST", "posts/PostPosts", object, UploadFile);
+        });
+        function UploadFile() {
+            var fileUpload = $("#image").get(0);
+            var files = fileUpload.files;
+            var data = new FormData();
+            data.append(files[0].name, files[0]);
+            $.ajax({
+                type: "POST", url: "/posts/UploadFile", contentType: false, processData: false,
+                data: data, async: false,
+                success: function (message) {
+                    toust.success("تم  تحميل الصورة بنجاح");
+                },
+                error: function () {
+                    toust.error("عذرا حدث خطا اثناء  تحميل الصورة");
+                },
+            });
+        }
+    </script>
+</div>

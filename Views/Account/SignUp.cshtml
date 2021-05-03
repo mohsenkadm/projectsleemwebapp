@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewData["Title"] = "SignUp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<article class="wow fadeInDown" data-wow-duration="500ms" data-delay="400ms"
+         style=" padding-top:85px; margin:0 auto; width:350px; ">
+    <div class="service-block text-center" style="background-color:#171a1d">
+        <div class="search-icon text-center">
+            <i style="font-size:90px;" class="tf-ion-coffee"></i>
+        </div>
+        <h3>انشاء حساب جديد</h3>
+        <br />
+        <div id="contact-form">
+            <div id="register">
+                <div class="form-group">
+                    <input type="text" placeholder="اسم المستخدم" autocomplete="off" class="form-control text-right" name="name" id="name" />
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="كلمة المرور" autocomplete="off" class="form-control text-right" name="pass" id="pass" />
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="البريد الالكتروني" autocomplete="off" class="form-control text-right" name="email" id="email" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="Register-btn" class="btn btn-transparent btn-animated"  value="تسجيل" />
+                </div>
+            </div>
+            <div id="confirm" style="display:none;">
+                <div class="form-group">
+                    <input type="text"  placeholder="رمز التاكيد" autocomplete="off" class="form-control" name="code" id="code" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="confirm-btn"  class="btn btn-transparent btn-animated"  value="تاكيد الحساب" />
+                </div>
+            </div>
+            <div class="inline-block" style="margin-top:20px; margin-bottom:-20px;">
+                <a style="cursor:pointer; float:left;" onclick="call_Action('Account/login1')" > تمتلك حساب ؟سجل الان</a>
+            </div>
+        </div>
+    </div>
+</article>
+<div id="mydiv">
+  
+    <script>
+        $("#Register-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                username: $("#name").val(),
+                password: $("#pass").val(),
+                email: $("#email").val()
+            };
+            if (object.username === "" || object.username.trim() === "") {
+                toust.warning("يرجى ادخال اسم المستخدم");
+                return;
+            }
+            else if (object.password === "" || object.password.trim() === "") {
+                toust.warning("يرجى ادخال كلمة المرور");
+                return;
+            }
+            else if (object.email === "" || object.email.trim() === "") {
+                toust.warning("يرجى ادخال البريد الالكتروني");
+                return;
+            }
+            call_ajax("POST", "Account/Register", object, after_register);
+        });
+        function after_register() {
+            $("#register").hide();
+            $("#confirm").fadeIn();
+        }
+        $("#confirm-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                code: $("#code").val(),
+                username: $("#name").val(),
+                Email: $("#email").val()
+            };
+            if (object.code === "" || object.code.trim() === "") {
+                toast.warning("يرجى ادخال رمز التاكيد");
+                return;
+            }
+            call_ajax("POST", "Account/ConfirmAccount", object, null);
+
+        });
+    </script>
+</div>

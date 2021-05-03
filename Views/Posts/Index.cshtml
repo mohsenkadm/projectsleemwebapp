@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MyLayout.cshtml";
+}
+
+<section id="search_posts" class="section" style="padding:20px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center wow fadeInDown">
+                <h2>اخر  <span class="color">المنتوجات </span></h2>
+                <div class="border"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="text-center form-group wow fadeInDown">
+                        <input type="text" placeholder="بحث عن اسم المنتج" style="width: 70%; margin-left: auto;" class="form-control text-right" autocomplete="off" name="item_name" id="item_name" />
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="text-center wow fadeInDown" style="text-align:left;">
+                        <input type="submit" id="search-btn" class="btn btn-main" style="text-align:left;" value="بحث" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<section id="blog" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center header-prmary-main wow fadeInDown">
+                    <h2>اخر <span class="color">المنتوجات</span></h2>
+                    <div class="border"></div>
+                </div>
+            <div id="posts" class="clearfix">
+
+            </div>
+            <div aria-label="Page navigation" class="text-center">
+                <ul class="pagination pagination-lg" id="pagination-wrapper">
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<div id="mydiv">
+    <script>  
+        var object = {
+            item_name: '',
+        };
+        $(document).ready(function () {
+            call_ajax("GET", "Posts/Getpost", object, buildTable);
+        });
+        $("#search-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                item_name: $("#item_name").val(),
+            };
+            if (object.item_name.trim() === "") {
+                toust.warning("رجاءا اكتب اسم المادة للبحث عنها");
+                return;
+            };
+            $('#posts_all').empty();
+            call_ajax("GET", "Posts/Getpost", object, buildTable);
+        });
+
+   
+    </script>
+</div>

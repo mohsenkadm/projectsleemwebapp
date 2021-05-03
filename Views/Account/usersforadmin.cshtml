@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewData["Title"] = "usersforadmin";
+    Layout = "~/Views/Shared/_MyLayout.cshtml";
+}
+<section id="search_posts" class="section" style="padding:20px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center wow fadeInDown">
+                <h2>معلومات  <span class="color"> المستخدمين </span></h2>
+                <div class="border"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="text-center form-group wow fadeInDown">
+                        <input type="text" placeholder="بحث عن اسم المستخدم" style="width: 70%; margin-left: auto;" class="form-control text-right" autocomplete="off" name="user_name" id="user_name" />
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="text-center wow fadeInDown" style="text-align:left;">
+                        <input type="submit" id="search-btn" class="btn btn-main" style="text-align:left;" value="بحث" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<div style="overflow-x: auto;">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    اسم المستخدم
+                </th>
+                <th>
+                    كلمة مرور
+                </th>
+                <th>
+                    ايميل
+                </th>
+                <th>
+                    اونلاين
+                </th>
+                <th>
+                    اخر تسجيل دخول
+                </th>
+                <th>
+                    اخر تسجيل خروج
+                </th>
+                <th>
+                    نشط
+                </th>
+                <th>
+                    تاريخ الادخال
+                </th>
+                <th>
+                    تاريخ التحديث
+                </th>
+                <th>
+
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody id="user_all">
+        </tbody>
+    </table>
+</div>
+<div id="mydiv">
+    <script>
+        var object = {
+            user_name: '',
+        };
+        call_ajax("GET", "Account/Getuser", object, filltable);
+        $("#search-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                user_name: $("#user_name").val(),
+            };
+            if (object.user_name.trim() === "") {
+                toust.warning("رجاءا اكتب اسم المستخدم للبحث");
+                return;
+            };
+            $('#user_all').empty();
+            call_ajax("GET", "Account/Getuser", object, filltable);
+        });
+
+        function filltable(data) {
+            if (data.length === 0) {
+                toust.error("لا توجد معلومات");
+                return;
+            }
+            // console.log(data);
+            $.each(data, function (i, item) {
+                var rows = "<tr> <td> " + item.userName + "</td>" + "<td> " + item.password + "</td>"
+                    + " <td> " + item.email + "</td>" + "<td> " + item.isonline + "</td>"
+                    + "<td> " + item.lastlogin + "</td>" + " <td> " + item.lastlogout + "</td>"
+                    + " <td> " + item.isActive + "</td>" + " <td> " + item.insertDate + "</td>"
+                    + " <td> " + item.updateDate + "</td>" +
+                    "<td> <a class='btn btn-main' id='deleteuser_btn' onclick =\"delete_user(" + item.id + ")\" > Delete</a> </td></tr>";
+                $('#user_all').append(rows);
+            });
+        }
+        function delete_user(id) {
+            var object1 = {
+                id: id,
+            }
+            call_ajax("DELETE", "Account/Deleteuser", object1, after_delete_user);
+        }
+        function after_delete_user() {
+            $('#user_all').empty();
+            call_ajax("GET", "Account/Getuser", object, filltable);
+        }
+    </script>
+</div>
+

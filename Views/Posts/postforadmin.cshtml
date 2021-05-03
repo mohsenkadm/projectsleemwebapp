@@ -1,0 +1,108 @@
+﻿
+@{
+    ViewData["Title"] = "postforadmin";
+    Layout = "~/Views/Shared/_MyLayout.cshtml";
+}
+<section id="search_posts" class="section" style="padding:20px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center wow fadeInDown">
+                <h2>معلومات <span class="color">المنتجات</span></h2>
+                <div class="border"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="text-center form-group wow fadeInDown">
+                        <input type="text" placeholder="بحث عن اسم المنتج" style="width: 70%; margin-left: auto;" class="form-control text-right" autocomplete="off" name="item_name" id="item_name" />
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="text-center wow fadeInDown" style="text-align:left;">
+                        <input type="submit" id="search-btn" class="btn btn-main" style="text-align:left;" value="بحث" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<div style="overflow-x: auto;">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    اسم المننتج
+                </th>
+                <th>
+                    تفاصيل المنتج
+                </th>
+                <th>
+                    سعر المنتج
+                </th>
+                <th>
+                    تاريخ اخر عرض للمنتج
+                </th>
+                <th>
+                    اسم المشتري
+                </th>
+                <th>
+                    سعر الشراء
+                </th>
+                <th>
+                    العرض
+                </th>
+            </tr>
+        </thead>
+        <tbody id="posts_all">
+        </tbody>
+    </table>
+</div>
+<div id="mydiv">
+    <script> 
+        var object = {
+            item_name: '',
+        };
+            $(document).ready(function () {
+              
+                call_ajax("GET", "Posts/Getpost", object, filltable2);
+            });
+            $("#search-btn").on("click", (e) => {
+                e.preventDefault();
+                var object = {
+                    item_name: $("#item_name").val(),
+                };
+                if (object.item_name.trim() === "") {
+                    toust.warning("رجاءا اكتب اسم المادة للبحث عنها");
+                    return;
+                };
+                $('#posts_all').empty();
+                call_ajax("GET", "Posts/Getpost", object, filltable2);
+            });
+        function filltable2(data) {
+            if (data.length === 0) {
+                toust.error("لا توجد معلومات");
+                return;
+            }
+            // console.log(data);
+            $.each(data, function (i, item) {
+                var rows = "<tr> <td> " + item.item_name + "</td>" + "<td> " + item.item_dateils + "</td>"
+                    + " <td> " + item.item_price + "</td>" + "<td> " + item.item_date + "</td>"
+                    + "<td> " + item.username + "</td>" + " <td> " + item.lastprice + "</td>"
+                    + " <td> " + item.isshow + "</td>"+
+                    "<td> <a class='btn btn-main' id='deletepost_btn' onclick =\"delete_post(" + item.id + ")\" > Delete</a> </td></tr>";
+                $('#posts_all').append(rows);
+            });
+        }
+        function delete_post(id) {
+            var object1 = {
+                id: id,
+            }
+            call_ajax("DELETE", "posts/Deletepost", object1, after_delete_post);
+        }
+        function after_delete_post() {
+            $('#posts_all').empty();
+            call_ajax("GET", "posts/Getpost", object, filltable2);
+        }
+    </script>
+</div>
+

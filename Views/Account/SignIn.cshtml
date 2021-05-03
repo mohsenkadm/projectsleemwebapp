@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewData["Title"] = "SignIn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<article class="wow fadeInDown" data-wow-duration="500ms" data-delay="400ms"
+         style=" padding-top:85px; margin:0 auto; width:350px; ">
+    <div class="service-block text-center" style="background-color:#171a1d">
+        <div class="search-icon text-center">
+            <i style="font-size:90px;" class="tf-ion-coffee"></i>
+        </div>
+        <h3>تسجيل الدخول</h3>
+        <br />
+        <div id="contact-form">
+            <div id="login">
+                <div class="form-group">
+                    <input type="text" placeholder="اسم المستخدم" autocomplete="off" class="form-control  text-right" name="name" id="name" />
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="كلمة المرور" autocomplete="off" class="form-control text-right" name="pass" id="pass" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="login-btn" class="btn btn-transparent btn-animated" value="دخول" />
+                </div>
+                <div class="inline-block" style="margin-top:20px; margin-bottom:-20px;">
+                    <a style="cursor:pointer; float:left;" onclick="call_Action('Account/SignUp')">لا تمتلك حساب ؟سجل الان</a>
+                    <a style="cursor:pointer; float:right; margin-left:75px;" onclick="forgat_pass()">نسيت كلمة السر؟</a>
+                </div>
+            </div>
+            <div id="email" style="display:none;">
+                <div class="form-group">
+                    <input type="text" placeholder="بريد الالكتروني" autocomplete="off" class="form-control" name="emailtxt" id="emailtxt" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="email-btn" class="btn btn-transparent btn-animated" value="ارسال الرمز" />
+                </div>
+            </div>
+            <div id="confirm" style="display:none;">
+                <div class="form-group">
+                    <input type="text" placeholder="رمز التاكيد" autocomplete="off" class="form-control" name="code" id="code" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="confirm-btn" class="btn btn-transparent btn-animated" value="تاكيد الحساب" />
+                </div>
+            </div>
+            <div id="newpass" style="display:none;">
+                <div class="form-group">
+                    <input type="text" placeholder="كلمة المرور الجديدة" autocomplete="off" class="form-control" name="newpassword" id="newpassword" />
+                </div>
+                <div id="cf-submit">
+                    <input type="submit" id="updatepass-btn" class="btn btn-transparent btn-animated" value="تعديل كلمة المرور" />
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+<div id="mydiv">
+    <script>
+        $("#updatepass-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                pass: $("#newpassword").val(),
+                email: $("#emailtxt").val(),
+            };
+            if (object.pass === "" || object.pass.trim() === "") {
+                toust.warning("يرجى ادخال كلمة المرور");
+                return;
+            }
+            call_ajax("POST", "Account/Update_Pass", object, after_updata_pass );
+        });
+        $("#email-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                email: $("#emailtxt").val(),
+            };
+            if (object.email === "" || object.email.trim() === "") {
+                toust.warning("يرجى ادخال بريد الالكتروني");
+                return;
+            }
+            call_ajax("POST", "Account/ForgatePassword", object, after_write_email);
+        });
+        $("#confirm-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                code: $("#code").val(),
+                username: '',
+                Email: $("#emailtxt").val()
+            };
+            if (object.code === "" || object.code.trim() === "") {
+                toast.warning("يرجى ادخال رمز التاكيد");
+                return;
+            }
+            call_ajax("POST", "Account/ConfirmAccount", object, after_confirm);
+        });
+        function after_login(token) {
+            setCookie("token1", token, 0.5);
+            call_Action("home/index");
+        }
+        $("#login-btn").on("click", (e) => {
+            e.preventDefault();
+            var object = {
+                username: $("#name").val(),
+                password: $("#pass").val(),
+            };
+            if (object.username === "" || object.username.trim() === "") {
+                toust.warning("يرجى ادخال اسم المستخدم");
+                return;
+            }
+            else if (object.password === "" || object.password.trim() === "") {
+                toust.warning("يرجى ادخال كلمة المرور");
+                return;
+            }
+            call_ajax("POST", "Account/Login", object, after_login);
+        });
+    </script>
+</div>
