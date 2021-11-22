@@ -7,8 +7,8 @@ namespace projectsleemwebapp.Classes
 {
     public class MailService
     {
-        private readonly string From = "ccars742@gmail.com";
-        private readonly string Pass = "mhsnmhmdali";
+        private readonly string From = "mzadlny1@gmail.com";
+        private readonly string Pass = "mz1mz2mz3";
        
         public string SendMail(string To, string Subject, string Body)
         {

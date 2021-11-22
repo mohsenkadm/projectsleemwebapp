@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
+using projectsleemwebapp.Classes;
 using projectsleemwebapp.Models;
 using projectsleemwebapp.Models.Entity.Security;
 using projectsleemwebapp.Models.IServices;
@@ -60,6 +61,9 @@ namespace projectsleemwebapp.Controllers
                 {
                     posts.image = posts.image.Substring(12);//posts.image.LastIndexOf("\\"));// _hostEnvironment.WebRootPath + $@"\images\imag_post" + posts.image.Substring(posts.image.LastIndexOf("\\"));
                 }
+                posts.Item_name = Encyptmethod.EncryptStringToBytes_Aes(posts.Item_name);
+                posts.Item_dateils = Encyptmethod.EncryptStringToBytes_Aes(posts.Item_dateils);
+
                 posts.isshow = true;
                 await _context.posts.AddAsync(posts);
                 await _context.SaveChangesAsync();
@@ -135,7 +139,14 @@ namespace projectsleemwebapp.Controllers
             {
                 await _postsServices.postsnotshow();
                 List<Posts> posts = await _postsServices.getposts_all(item_name);
+                foreach(var p in posts)
+                {
+                    p.Item_name = Encyptmethod.DecryptStringFromBytes_Aes(p.Item_name);
+                    p.Item_dateils = Encyptmethod.DecryptStringFromBytes_Aes(p.Item_dateils);
+                    if(p.username!=null && p.username!="" && p.username!="null")
+                    p.username = Encyptmethod.DecryptStringFromBytes_Aes(p.username);
 
+                }
                 return Json(new { success = true, data = posts });
             }
             catch (Exception ex)
@@ -149,7 +160,10 @@ namespace projectsleemwebapp.Controllers
             try
             {
                 List<postuser> posts = await _postuserServices.getpostuser(post_id);
-
+                foreach (var p in posts)
+                {
+                    p.username = Encyptmethod.DecryptStringFromBytes_Aes(p.username);
+                }
                 return Json(new { success = true, data = posts });
             }
             catch (Exception ex)

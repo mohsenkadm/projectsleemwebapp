@@ -46,6 +46,8 @@ namespace projectsleemwebapp.Controllers
         {
             try
             {
+                username=Encyptmethod.EncryptStringToBytes_Aes(username);
+                password=Encyptmethod.EncryptStringToBytes_Aes(password);
                 //daaper
                 Users user = await _userServices.Login_chek(username, password);
                 if (user == null)
@@ -56,6 +58,7 @@ namespace projectsleemwebapp.Controllers
                 _context.Entry(user).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 _UserId = user.Id;
+                user.UserName = Encyptmethod.DecryptStringFromBytes_Aes(user.UserName);
                 UserManger = user;
                 HttpContext.Session.SetString("isadmin", user.isadmin.ToString());
 
@@ -73,9 +76,12 @@ namespace projectsleemwebapp.Controllers
         [Route("Account/Register")]
         public async Task<JsonResult> Register(Users users)
         {
-        
             try
             {
+                string email= users.Email;
+                users.UserName=Encyptmethod.EncryptStringToBytes_Aes(users.UserName);
+                users.Email= Encyptmethod.EncryptStringToBytes_Aes(users.Email);
+                users.Password= Encyptmethod.EncryptStringToBytes_Aes(users.Password);
                 Users check = await _userServices.CheckUserinfo(users.UserName, users.Email);
                 if (check != null)
                     return Json(new { success = false, msg = "عذرا اسم المتسخدم او البريد الالكتروني  محجوز" });
@@ -87,8 +93,9 @@ namespace projectsleemwebapp.Controllers
                 users.IsConfirm = false;
                 users.isadmin = false;
                 users.Code = random.Next(100000, 999999).ToString();
-               // MailService mail = new MailService();
-               // mail.SendMail(users.Email, "car store", "Confirm Account Code : " + users.Code);
+                
+                MailService mail = new MailService();
+                mail.SendMail(email, "car store", "Confirm Account Code : " + users.Code);
 
                 await _context.Users.AddAsync(users);
                 await _context.SaveChangesAsync();
@@ -107,6 +114,7 @@ namespace projectsleemwebapp.Controllers
         {
             try
             {
+                email= Encyptmethod.EncryptStringToBytes_Aes(email);
                 Users check = await _userServices.CheckUserinfo("", email);
                 if (check == null)
                     return Json(new { success = false, msg = "عذرا بريد الالكتروني غير موجود سابقا" });
@@ -133,6 +141,7 @@ namespace projectsleemwebapp.Controllers
         {
             try
             {
+                email=Encyptmethod.EncryptStringToBytes_Aes(email);
                 Users check = await _userServices.CheckUserinfo("", email);
                 if (check == null)
                     return Json(new { success = false, msg = "عذرا بريد الالكتروني غير موجود سابقا" });
@@ -153,6 +162,8 @@ namespace projectsleemwebapp.Controllers
         {
             try
             {
+                username=Encyptmethod.EncryptStringToBytes_Aes(username);
+                Email=Encyptmethod.EncryptStringToBytes_Aes(Email);
                 Users users = await _userServices.checkConfirmAccount(code, username, Email);
                 if (users == null)
                     return Json(new { success = false, msg = "معلومات التاكيد غير صحيحه" });
@@ -172,7 +183,12 @@ namespace projectsleemwebapp.Controllers
             try
             {
                 List<Users> users = await _userServices.getuser_all(user_name);
-              
+                foreach (var u in users)
+                {
+                    u.UserName = Encyptmethod.DecryptStringFromBytes_Aes(u.UserName);
+                    u.Email = Encyptmethod.DecryptStringFromBytes_Aes(u.Email);
+                    u.Password = Encyptmethod.DecryptStringFromBytes_Aes(u.Password);
+                }
                 return Json(new { success = true ,data=users });
             }
             catch (Exception ex)
